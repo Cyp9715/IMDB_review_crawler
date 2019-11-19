@@ -7,8 +7,8 @@ from multiprocessing import Pool, Value
 # specify the location of file or variable, You don't have to do anything...
 cromdriver_location = './Basic_Data/chromedriver'
 tconstfile_location = './Basic_Data/Movie_Genres.tsv'
-savefile_location = './IMDB_review_crawling2/'
-errorfile_location = './IMDB_review_crawling2/Error.tsv'
+savefile_location = './IMDB_review_crawling3/'
+errorfile_location = './IMDB_review_crawling3/Error.tsv'
 multiprocess_count = 24
 
 
@@ -119,13 +119,6 @@ def start(i):
                     s.write("\t")
                     s.write(Content[row])
                     s.write("\n")
-
-            Star.clear()
-            User.clear()
-            Title.clear()
-            Content.clear()
-            driver.quit()
-
             break
 
         except:
@@ -135,15 +128,24 @@ def start(i):
                 e.write(T_const[i])
                 e.write("\n")
 
+        finally:
+            Star.clear()
+            User.clear()
+            Title.clear()
+            Content.clear()
+            driver.quit()
+
     print(T_const[i] + " | " + str(counter.value) + "/" + str(T_const.__len__()) + " | " + str(
         round(counter.value / T_const.__len__() * 100, 3)) + "%")
-    counter.value += 1
+
+    with counter.get_lock():
+        counter.value += 1
 
 
 base = Base()
 T_const = base.tconst_list()
+counter = Value('i', 1)
 
 if __name__ == '__main__':
-    counter = Value('i', 1)
     pool = Pool(initializer=base.init, initargs=(counter,), processes=multiprocess_count)
     pool.map(start, range(0, T_const.__len__()))
