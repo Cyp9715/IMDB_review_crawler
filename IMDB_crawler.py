@@ -23,6 +23,11 @@ class Base:
         global counter
         counter = temp
 
+    def plus_counter(self):
+        with counter.get_lock():
+            counter.value += 1
+
+
     def tconst_list(self):
         T_const_Temp = []
 
@@ -119,6 +124,12 @@ def start(i):
                     s.write("\t")
                     s.write(Content[row])
                     s.write("\n")
+
+            base.plus_counter()
+
+            print(T_const[i] + " | " + str(counter.value) + "/" + str(T_const.__len__()) + " | " + str(
+                round(counter.value / T_const.__len__() * 100, 3)) + "%")
+
             break
 
         except:
@@ -135,16 +146,12 @@ def start(i):
             Content.clear()
             driver.quit()
 
-    print(T_const[i] + " | " + str(counter.value) + "/" + str(T_const.__len__()) + " | " + str(
-        round(counter.value / T_const.__len__() * 100, 3)) + "%")
 
-    with counter.get_lock():
-        counter.value += 1
 
 
 base = Base()
 T_const = base.tconst_list()
-counter = Value('i', 1)
+counter = Value('i', 0)
 
 if __name__ == '__main__':
     pool = Pool(initializer=base.init, initargs=(counter,), processes=multiprocess_count)
