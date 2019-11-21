@@ -1,5 +1,5 @@
 # Python-IMDB review Crawler
-IMDB reviews crawler using Python
+IMDB reviews crawler, using Python
 
 If you don't use Korean, use Google Translator.
 
