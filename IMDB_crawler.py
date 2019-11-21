@@ -3,33 +3,22 @@ from bs4 import BeautifulSoup
 import time
 from multiprocessing import Pool, Value
 
-
 # specify the location of file or variable, You don't have to do anything...
 cromdriver_location = './Basic_Data/chromedriver'
 tconstfile_location = './Basic_Data/Movie_Genres.tsv'
 savefile_location = './IMDB_review_crawling3/'
 errorfile_location = './IMDB_review_crawling3/Error.tsv'
-multiprocess_count = 24
-
+multiprocess_count = 8
 
 # 사용 변수
-T_const = []
 driver = webdriver
 Star, User, Title, Content = [], [], [], []
-counter = None
+
 
 class Base:
-    def init(self, temp):
-        global counter
-        counter = temp
-
-    def plus_counter(self):
-        with counter.get_lock():
-            counter.value += 1
-
-
     def tconst_list(self):
-        T_const_Temp = []
+        global T_const
+        T_const, T_const_Temp = [], []
 
         with open(tconstfile_location) as f:
             for line in f:
@@ -39,6 +28,19 @@ class Base:
                 temp = temp.replace('\n', '').replace("\"", '')
                 T_const.append(temp)
             return T_const
+
+    def init(self, temp):
+        global counter
+        counter = temp
+
+    def plus_counter(self, number):
+        global counter
+
+        with counter.get_lock():
+            counter.value += 1
+            normal = (T_const[number] + " | " + str(counter.value) + "/" + str(T_const.__len__()) + " | " + str(
+                round(counter.value / T_const.__len__() * 100, 3)) + "%")
+            print(normal)
 
 
 # Preprocessing 클래스가 인스턴스로 선언 될 때마다 __init__ 이 실행됩니다.
@@ -65,16 +67,18 @@ class Preprocessing:
 
 class Crawler:
     def click(self):
+        global driver
+        
         while True:
             try:
                 time.sleep(5)
                 driver.find_element_by_xpath("//*[@id='load-more-trigger']").click()
             except:
-                break;
+                break
 
-        return driver
+    def find_web(self):
+        global driver
 
-    def find_web(self, driver):
         html = driver.page_source
         soup = BeautifulSoup(html, "html.parser")
         reviews = soup.find_all('div', class_='review-container')
@@ -90,13 +94,16 @@ class Crawler:
             Content.append(review.find('div', class_='content').div.text)
 
 
-def start(i):
+def start(number):
     global Star
     global User
     global Title
     global Content
     global driver
     global counter
+    global T_const
+
+    Craw = Crawler()
 
     # The [While True] is for resolving intermittent Chrome driver errors.
     while True:
@@ -105,15 +112,15 @@ def start(i):
             options.add_argument('headless')
             options.add_argument("disable-gpu")
             driver = webdriver.Chrome(executable_path=cromdriver_location, chrome_options=options)
-            driver.get('https://www.imdb.com/title/' + str(T_const[i]) + '/reviews?ref_=tt_ov_rt')
+            driver.get('https://www.imdb.com/title/' + str(T_const[number]) + '/reviews?ref_=tt_ov_rt')
 
-            Craw = Crawler()
-            Craw.find_web(Craw.click())
+            Craw.click()
+            Craw.find_web()
             Star = Preprocessing().trash_remove_star(Star)
             Title = Preprocessing().trash_remove(Title)
             Content = Preprocessing().trash_remove(Content)
 
-            write = (savefile_location + str(T_const[i]) + ".tsv")
+            write = (savefile_location + str(T_const[number]) + ".tsv")
             with open(write, 'w', encoding='utf-8') as s:
                 for row in range(Star.__len__()):
                     s.write(Star[row])
@@ -125,18 +132,14 @@ def start(i):
                     s.write(Content[row])
                     s.write("\n")
 
-            base.plus_counter()
-
-            print(T_const[i] + " | " + str(counter.value) + "/" + str(T_const.__len__()) + " | " + str(
-                round(counter.value / T_const.__len__() * 100, 3)) + "%")
-
+            base.plus_counter(number)
             break
 
         except:
-            print("Error!!" + T_const[i])
+            print("Error!!" + T_const[number])
             write_error = errorfile_location
             with open(write_error, 'a', encoding='utf-8') as e:
-                e.write(T_const[i])
+                e.write(T_const[number])
                 e.write("\n")
 
         finally:
@@ -145,8 +148,6 @@ def start(i):
             Title.clear()
             Content.clear()
             driver.quit()
-
-
 
 
 base = Base()
