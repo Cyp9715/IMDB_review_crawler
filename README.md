@@ -3,7 +3,7 @@ IMDB reviews crawler, using Python
 
 If you don't use Korean, use Google Translator.
 
-It's not hard, Personally, I do not feel much value in translating.(Only this repo)
+It's not hard. Personally, I do not feel much value in translating.(Only this repo)
 
 # 1. 권장 사양
 
