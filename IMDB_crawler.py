@@ -8,7 +8,7 @@ cromdriver_location = './Basic_Data/chromedriver'
 tconstfile_location = './Basic_Data/Movie_Genres.tsv'
 savefile_location = './IMDB_review_crawling3/'
 errorfile_location = './IMDB_review_crawling3/Error.tsv'
-multiprocess_count = 8
+multiprocess_count = 24
 
 # 사용 변수
 driver = webdriver
