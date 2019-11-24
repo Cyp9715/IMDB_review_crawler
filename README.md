@@ -63,7 +63,7 @@ Pycharm 내에서 다음과 같이 출력됩니다.
 
 ![save](https://user-images.githubusercontent.com/16573620/68954724-f23b7e80-0807-11ea-84d3-7a40fa7cbee9.png)
 
-# 4. 알아둬야 할 사안.
+# 4. 주의사항.
 
 #### 1) IMDB 내 보이는 총 영화 리뷰 수는 정확하지 않습니다.
 
