@@ -101,4 +101,4 @@ Pycharm 내에서 다음과 같이 출력됩니다.
 
   이를 제거하는것을 권장 드립니다.
 
-  Windows -> taskKill, Linux -> kill -9 명령어를 이용 하시거나, 재부팅 하십시오.
+  Windows -> taskkill, Linux -> kill -9 명령어를 이용 하시거나, 재부팅 하십시오.
